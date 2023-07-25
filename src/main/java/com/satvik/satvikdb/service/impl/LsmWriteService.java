@@ -1,26 +1,16 @@
 package com.satvik.satvikdb.service.impl;
 
-import com.satvik.satvikdb.context.Index;
-import com.satvik.satvikdb.context.LsmDbIndex;
 import com.satvik.satvikdb.context.Memtable;
-import com.satvik.satvikdb.context.SimpleDbIndex;
-import com.satvik.satvikdb.model.ByteOffset;
 import com.satvik.satvikdb.model.DbFilePath;
 import com.satvik.satvikdb.model.KeyValuePair;
 import com.satvik.satvikdb.utils.GeneralUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static com.satvik.satvikdb.utils.GeneralUtils.numDigits;
 
 public class LsmWriteService {
     private String walPath;

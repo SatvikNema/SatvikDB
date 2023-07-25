@@ -10,8 +10,8 @@ import java.util.function.BiConsumer;
 public class LsmDbIndex implements Index{
     private final LinkedHashMap<String, ByteOffset> index;
 
-    public LsmDbIndex(LinkedHashMap<String, ByteOffset> index) {
-        this.index = index;
+    public LsmDbIndex() {
+        this.index = new LinkedHashMap<>();
     }
 
     public Map<String, ByteOffset> getIndex(){

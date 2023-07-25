@@ -56,7 +56,6 @@ public class LsmReadService {
             if(value!=null){
                 return Optional.of(value);
             }
-//            System.out.println("value not found in "+dbFilePath.getDbFilePath());
         }
         return Optional.empty();
     }

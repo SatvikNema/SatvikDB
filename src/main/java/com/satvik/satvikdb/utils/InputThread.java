@@ -33,7 +33,7 @@ public class InputThread extends Thread {
                 }else if("exit".equals(input)){
                     break;
                 } else {
-                    System.out.println("wrong input enetered. please try again");
+                    System.out.println("wrong input entered. please try again");
                 }
             }
         }catch(IOException e){

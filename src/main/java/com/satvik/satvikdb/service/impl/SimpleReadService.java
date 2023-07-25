@@ -35,8 +35,9 @@ public class SimpleReadService implements ReadService {
             try {
                 raf.close();
             } catch (IOException e) {
-                System.out.println("error occured while closing the file");
+                System.out.println("error occurred while closing the file");
             }
+            // update the in memory cache
             simpleDbIndex.put(fileEntry.getKeyValuePair().getKey(), fileEntry.getByteOffset());
             return fileEntry.getKeyValuePair().getValue();
         }

@@ -1,7 +1,5 @@
 package com.satvik.satvikdb.model;
 
-import java.util.concurrent.Future;
-
 /**
  * represents an entry in the db file
  * KeyValuePair is the data

@@ -160,7 +160,7 @@ public class GeneralUtils {
     }
 
     public static Index loadIndex(String indexFilePath) {
-        Index index = new LsmDbIndex(new LinkedHashMap<>());
+        Index index = new LsmDbIndex();
         List<String> indexData = null;
         try {
             indexData = Files.readAllLines(Path.of(indexFilePath));
@@ -378,7 +378,7 @@ public class GeneralUtils {
         AtomicLong currentCount = new AtomicLong(0);
         int sparseValue = 10;
         int batchSize = 10;
-        Index index = new LsmDbIndex(new LinkedHashMap<>());
+        Index index = new LsmDbIndex();
         AtomicReference<StringBuilder> sb = new AtomicReference<>(new StringBuilder());
         data.forEach(keyValuePair -> {
             String key = keyValuePair.getKey();
@@ -414,7 +414,6 @@ public class GeneralUtils {
                 throw new RuntimeException(e);
             }
         }
-
         GeneralUtils.saveIndex(dbFilePath.getIndexFilePath(), index);
     }
 }
