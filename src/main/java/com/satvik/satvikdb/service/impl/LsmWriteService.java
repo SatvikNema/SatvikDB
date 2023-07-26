@@ -27,7 +27,6 @@ public class LsmWriteService {
         }
 
         memtable.put(key, value);
-        System.out.println("threshold: "+memtable.getSize());
         if(memtable.isThresholdPassed()){
             // write memtable to dbFilePath and indexFilePath
             System.out.println("threshold of "+memtable.getThreshold()+" is passed. Making new files");

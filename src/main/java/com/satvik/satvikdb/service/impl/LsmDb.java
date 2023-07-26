@@ -3,19 +3,13 @@ package com.satvik.satvikdb.service.impl;
 import com.satvik.satvikdb.context.Memtable;
 import com.satvik.satvikdb.model.DbFilePath;
 import com.satvik.satvikdb.service.DbService;
-import com.satvik.satvikdb.service.ReadService;
-import com.satvik.satvikdb.service.WriteService;
 import com.satvik.satvikdb.utils.GeneralUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 public class LsmDb extends DbService {
     private LsmReadService lsmReadService;
@@ -39,8 +33,8 @@ public class LsmDb extends DbService {
         walPath = rootDir + File.separatorChar + walName;
         GeneralUtils.createFileIfNotExists(walPath);
 
-        memtable = new Memtable(1000);
-        // TODO if wal is non empty, load content from wal into memtable
+        memtable = new Memtable(1000000);
+        // todo if wal is non empty, load content from wal into memtable
 
         writeService = new LsmWriteService(walPath);
         lsmReadService = new LsmReadService(rootDir, dbFileNameStartsWith, indexFileNameStartsWith);

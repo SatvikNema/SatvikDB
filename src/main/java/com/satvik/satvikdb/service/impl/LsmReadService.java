@@ -51,13 +51,14 @@ public class LsmReadService {
 
     private Optional<String> findValueInFiles(String key, List<DbFilePath> diskLookups) {
         String value;
+        Optional<String> result = Optional.empty();
         for(DbFilePath dbFilePath : diskLookups){
             value = findValueInFile(key, dbFilePath);
             if(value!=null){
-                return Optional.of(value);
+                result = Optional.of(value);
             }
         }
-        return Optional.empty();
+        return result;
     }
 
     private String findValueInFile(String key, DbFilePath dbFilePath) {

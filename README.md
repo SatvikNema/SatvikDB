@@ -1,5 +1,75 @@
 # SatvikDB
-A simple implementation of a LSM based key value store.
-Inspiration from [DDIA][1]
+An implementation of a LSMT (Log Structured Merge Tree) based key value store.
+Closely follows [DDIA][1]'s database chapter.
+
+An implementation of a simple database. A key-value store.
+Writing the same key twice updates the key's value to the newer one.
+Deletion not yet implemented.
+
+### Run on your local
+Update the paths where you would like to save the database files
+```bash
+open src/main/java/com/satvik/satvikdb/utils/SimpleDbConstants.java
+open src/main/java/com/satvik/satvikdb/utils/LsmDbConstants.java
+```
+and update the `ROOT_DIR` variable to match your desired path.
+
+Run `src/test/java/com/satvik/satvikdb/SatvikDbTest.java` and see the files created on your `ROOT_DIR`
+
+
+
+## LSM Database
+
+### Writes: `key, value`
+1. Put the `key, value` pair in the WAL file (Write Ahead Log)
+2. Put the tuple in the in-memory `SortedMap`. This is an LSM based DB, so keys will be in sorted order. 
+3. If the size of the map exceeds a certain threshold, dump the values in filesystem. Make sure the corresponding indexes are also created (sparse - 1 entry per 100ish records). Clear the in memory map, making it ready for upcoming writes.
+4. The indexes will contain the `ByteOffsets` where the value was written, so that we can directly seek at that location.
+5. Now as the map already had the values in sorted order, the values in files are also sorted.
+
+The purpose of WAL is to restore the pending writes, in case the `LsmWriteService` becomes overloaded due to some reason and crashes.
+Each time the `LsmWriteService` is started, it first checks if the WAL is empty.
+If not, it first writes the values pending in WAL and then clears it.
+
+
+### Reads: `key`
+1. Lookup the in memory `SortedMap`. 
+2. If found, return the value.
+3. If not, load the latest index file from the file system in memory.
+4. Apply a binary search on the index's keys. Find the `left` pointer, just before `key`.
+5. If you reach the start with no `left` value, load the previous index file.
+6. As soon as you find a hit, load the `ByteOffset` of the `value` 
+7. open the corresponding database file and seek from the `ByteOffset` returned by the index file.
+8. Start a linear search from here and return the first match with `key`
+9. If there's no match for `key`, return null
+
+### Compaction
+
+Run the merging process in some defined time interval.
+1. loads all the database files
+2. Does a `merge K sorted lists` kind of algorithm in a batch of `n` files.
+3. Each `RandomAccessFile` is considered as a 'sorted array'.
+4. If there are 2 keys with the same name, take the one which is in a latter file. This happens when an old value was overwritten by the user.
+5. After the new merged file is created, delete the old files.
+
+
+## Other implementations - Simple db
+This project also includes an implementation of a simple append only database which stores the keys in the order in which they were written. Includes no optimisation.
+To see how that works, change the code in main/test file to this
+```java
+DbService dbService = DbFactory.getDbService(TypesEnum.SIMPLE);
+```
+## Simple database
+### Writes: `key, value`
+1. Directly writes into the database file in append mode.
+2. corresponding indexes are also created (dense - 1 entry for each key)
+3. The index contains the key's `ByteOffset` of `value` in the file.
+
+
+### Reads: `key`
+1. load the latest index file.
+4. Does a linear scan until in encounters the `key`
+5. Notes the `ByteOffset` of the corresponding `value`
+6. Opens the file, directly seeking to the `ByteOffset` and returns the `value`
 
 [1]: https://dataintensive.net/

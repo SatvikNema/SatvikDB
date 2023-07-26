@@ -74,7 +74,7 @@ public class MergeService {
 
         List<KeyValuePair> dataToWrite = new ArrayList<>();
 
-        int mergedContentSize = 100; // batch size -> number of keys the new files should have
+        int mergedContentSize = 18000; // batch size -> number of keys the new files should have
 
         while(true){
             minKey = "~";
@@ -100,7 +100,6 @@ public class MergeService {
                 break;
             }
             keys.add(minKey);
-            System.out.println("minimum in this iteration: "+minKey+" --> "+entryWithLeastKey.getCurrentLine());
 
             if(dataToWrite.size() >= mergedContentSize){
                 writeToNewDbFile(dataToWrite);

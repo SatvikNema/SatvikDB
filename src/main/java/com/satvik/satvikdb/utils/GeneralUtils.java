@@ -75,9 +75,9 @@ public class GeneralUtils {
     public static ByteOffset getByteOffset(long keyStartByte, int keyLength, int valueLength){
         long valueLenStartByte = keyStartByte + keyLength + 1; // +1 for additional space
         long valueStartByte = valueLenStartByte + numDigits(valueLength) + 1; // +1 to account for the extra space after value length
-        System.out.println("key written at: "+keyStartByte);
-        System.out.println("Length written at: "+valueLenStartByte);
-        System.out.println("Value written at: "+valueStartByte);
+//        System.out.println("key written at: "+keyStartByte);
+//        System.out.println("Length written at: "+valueLenStartByte);
+//        System.out.println("Value written at: "+valueStartByte);
         return new ByteOffset(valueLenStartByte, valueStartByte);
     }
 
@@ -360,7 +360,6 @@ public class GeneralUtils {
             Path indexFilePath = Path.of(dbFileEntity.getIndexFilePath());
             deleteFile(dbFilePath);
             deleteFile(indexFilePath);
-            System.out.println("hello world");
         }
     }
 
@@ -376,8 +375,8 @@ public class GeneralUtils {
     public static void writeToDisk(DbFilePath dbFilePath, long startSize, List<KeyValuePair> data) {
         AtomicLong finalStartSize = new AtomicLong(startSize);
         AtomicLong currentCount = new AtomicLong(0);
-        int sparseValue = 10;
-        int batchSize = 10;
+        int sparseValue = 100;
+        int batchSize = 100;
         Index index = new LsmDbIndex();
         AtomicReference<StringBuilder> sb = new AtomicReference<>(new StringBuilder());
         data.forEach(keyValuePair -> {
