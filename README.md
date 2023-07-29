@@ -22,12 +22,14 @@ Run `src/test/java/com/satvik/satvikdb/SatvikDbTest.java` and see the files crea
 
 ### Writes: `key, value`
 1. Put the `key, value` pair in the WAL file (Write Ahead Log)
-2. Put the tuple in the in-memory `SortedMap`. This is an LSM based DB, so keys will be in sorted order. 
-3. If the size of the map exceeds a certain threshold, dump the values in filesystem. Make sure the corresponding indexes are also created (sparse - 1 entry per 100ish records). Clear the in memory map, making it ready for upcoming writes.
+2. Put the tuple in the in-memory `SortedMap`. This data structure is also called `memtable`. This is an LSM based DB, so keys will be in sorted order. 
+3. If the size of the map exceeds a certain threshold, dump the values in filesystem as the latest `SSTable` file. Make sure the corresponding indexes are also created (sparse - 1 entry per 100ish records). Clear the in memory map, making it ready for upcoming writes.
 4. The indexes store `ByteOffsets` where the value was written, so that we can directly seek at that location.
 5. A `ByteOffset` is the location of a byte in the file, 0-indexed 
 6. Now as the map already had the values in sorted order, the values in files are also sorted.
-7. Run `Compaction` every once in a while, or when the number of files cross a certain threshold. Refer [compaction](#compaction) 
+7. Run `Compaction` every once in a while, or when the number of files cross a certain threshold. Refer [compaction](#compaction)
+
+The chain of these `SSTables` files is also called Log Structured Merge Tree (LSTM) 
 
 #### Purpose of WAL 
 In case the `LsmWriteService` becomes overloaded due to some reason and crashes, 
@@ -59,6 +61,7 @@ Run the merging process in some defined time interval.
 
 Compaction is idempotent, i.e you can run it x number of times, but the result will not affect database reads or writes.
 
+This flow is similar to what [LevelDB](https://github.com/google/leveldb) and [RocksBD](https://github.com/facebook/rocksdb) do.
 
 ## Other implementations - Simple db
 This project also includes an implementation of a simple append only database which stores the keys in the order in which they were written. Includes no optimisation.
@@ -75,8 +78,13 @@ DbService dbService = DbFactory.getDbService(TypesEnum.SIMPLE);
 
 ### Reads: `key` in `O(n)`
 1. load the latest index file.
-4. Does a linear scan until in encounters the `key`
-5. Notes the `ByteOffset` of the corresponding `value`
-6. Opens the file, directly seeking to the `ByteOffset` and returns the `value`
+2. Does a linear scan until in encounters the `key`
+3. Notes the `ByteOffset` of the corresponding `value`
+4. Opens the file, directly seeking to the `ByteOffset` and returns the `value`
+
+## Todo
+ - [ ] Implement delete feature
+ - [ ] add bloom filter to filter out missing keys
+ - [ ] optimise compaction to be `size tiered` / `level tiered` 
 
 [1]: https://dataintensive.net/
