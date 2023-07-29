@@ -2,9 +2,8 @@
 An implementation of a LSMT (Log Structured Merge Tree) based key value store.
 Closely follows [DDIA][1]'s database chapter.
 
-An implementation of a simple database. A key-value store.
+It's a simple key-value store.
 Writing the same key twice updates the key's value to the newer one.
-Deletion not yet implemented.
 
 ### Run on your local
 Update the paths where you would like to save the database files
@@ -17,6 +16,7 @@ and update the `ROOT_DIR` variable to match your desired path.
 Run `src/test/java/com/satvik/satvikdb/SatvikDbTest.java` and see the files created on your `ROOT_DIR`
 
 
+# How it works
 
 ## LSM Database
 
@@ -24,15 +24,20 @@ Run `src/test/java/com/satvik/satvikdb/SatvikDbTest.java` and see the files crea
 1. Put the `key, value` pair in the WAL file (Write Ahead Log)
 2. Put the tuple in the in-memory `SortedMap`. This is an LSM based DB, so keys will be in sorted order. 
 3. If the size of the map exceeds a certain threshold, dump the values in filesystem. Make sure the corresponding indexes are also created (sparse - 1 entry per 100ish records). Clear the in memory map, making it ready for upcoming writes.
-4. The indexes will contain the `ByteOffsets` where the value was written, so that we can directly seek at that location.
-5. Now as the map already had the values in sorted order, the values in files are also sorted.
+4. The indexes store `ByteOffsets` where the value was written, so that we can directly seek at that location.
+5. A `ByteOffset` is the location of a byte in the file, 0-indexed 
+6. Now as the map already had the values in sorted order, the values in files are also sorted.
+7. Run `Compaction` every once in a while, or when the number of files cross a certain threshold. Refer [compaction](#compaction) 
 
-The purpose of WAL is to restore the pending writes, in case the `LsmWriteService` becomes overloaded due to some reason and crashes.
-Each time the `LsmWriteService` is started, it first checks if the WAL is empty.
+#### Purpose of WAL 
+In case the `LsmWriteService` becomes overloaded due to some reason and crashes, 
+the outstanding writes will still remain in the WAL. Hence,
+each time the `LsmWriteService` is started, it first checks if the WAL is empty.
 If not, it first writes the values pending in WAL and then clears it.
 
 
-### Reads: `key`
+### Reads: `key` in `O(logn)`
+n are the number of keys present in the database
 1. Lookup the in memory `SortedMap`. 
 2. If found, return the value.
 3. If not, load the latest index file from the file system in memory.
@@ -49,8 +54,10 @@ Run the merging process in some defined time interval.
 1. loads all the database files
 2. Does a `merge K sorted lists` kind of algorithm in a batch of `n` files.
 3. Each `RandomAccessFile` is considered as a 'sorted array'.
-4. If there are 2 keys with the same name, take the one which is in a latter file. This happens when an old value was overwritten by the user.
+4. If there are 2 keys with the same name, take the one which is in a latter file. We essentially only want to keep the latest value for a given `key`
 5. After the new merged file is created, delete the old files.
+
+Compaction is idempotent, i.e you can run it x number of times, but the result will not affect database reads or writes.
 
 
 ## Other implementations - Simple db
@@ -66,7 +73,7 @@ DbService dbService = DbFactory.getDbService(TypesEnum.SIMPLE);
 3. The index contains the key's `ByteOffset` of `value` in the file.
 
 
-### Reads: `key`
+### Reads: `key` in `O(n)`
 1. load the latest index file.
 4. Does a linear scan until in encounters the `key`
 5. Notes the `ByteOffset` of the corresponding `value`
