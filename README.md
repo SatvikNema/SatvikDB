@@ -1,6 +1,6 @@
 # SatvikDB
 An implementation of a LSMT (Log Structured Merge Tree) based key value store.
-Closely follows [DDIA][1]'s database chapter.
+Follows [DDIA][1]'s database chapter.
 
 It's a simple key-value store.
 Writing the same key twice updates the key's value to the newer one.
