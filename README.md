@@ -1,4 +1,4 @@
-# SatvikDB
+# NotSoEfficientDB
 An implementation of a LSMT (Log Structured Merge Tree) based key value store.
 Follows [DDIA][1]'s database chapter.
 
