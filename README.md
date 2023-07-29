@@ -1,9 +1,6 @@
 # NotSoEfficientDB
 An implementation of a LSMT (Log Structured Merge Tree) based key value store.
-Follows [DDIA][1]'s database chapter.
-
-It's a simple key-value store.
-Writing the same key twice updates the key's value to the newer one.
+Follows [DDIA][1]'s storage chapter.
 
 ### Run on your local
 Update the paths where you would like to save the database files
@@ -52,6 +49,8 @@ n are the number of keys present in the database
 
 ### Compaction
 
+As our database grows over time, we might have thousands of `SSTable` files created, many of which might have overwritten or old data.
+
 Run the merging process in some defined time interval.
 1. loads all the database files
 2. Does a `merge K sorted lists` kind of algorithm in a batch of `n` files.
@@ -84,7 +83,7 @@ DbService dbService = DbFactory.getDbService(TypesEnum.SIMPLE);
 
 ## Todo
  - [ ] Implement delete feature
- - [ ] add bloom filter to filter out missing keys
- - [ ] optimise compaction to be `size tiered` / `level tiered` 
+ - [ ] Add bloom filter to filter out missing keys. Currently, if the lookup key is not present in the database, we scan all the `SSTable` indexes. This is not very efficient.
+ - [ ] Optimise compaction to be `size tiered` / `level tiered` 
 
 [1]: https://dataintensive.net/
