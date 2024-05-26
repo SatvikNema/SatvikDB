@@ -1,5 +1,7 @@
 package com.satvik.satvikdb.service.impl;
 
+import com.satvik.satvikdb.bloomfilter.BloomFilter;
+import com.satvik.satvikdb.context.FeatureFlags;
 import com.satvik.satvikdb.context.Memtable;
 import com.satvik.satvikdb.model.DbFilePath;
 import com.satvik.satvikdb.model.KeyValuePair;
@@ -16,9 +18,10 @@ public class LsmWriteService {
     private String walPath;
     public LsmWriteService(String walPath) {
         this.walPath = walPath;
+
     }
 
-    public void write(String key1, String value, Memtable memtable, LsmDb lsmDb) {
+    public void write(String key1, String value, Memtable memtable, BloomFilter<String> bloomFilter, LsmDb lsmDb) {
         String key = key1.replaceAll("\\s+", "_");
         try {
             Files.write(Path.of(walPath), GeneralUtils.getSimpleByteEncoding(key, value), StandardOpenOption.APPEND);
@@ -27,16 +30,18 @@ public class LsmWriteService {
         }
 
         memtable.put(key, value);
+        if(FeatureFlags.BLOOM_FILTERS_ENABLED) {
+            bloomFilter.add(key);
+        }
         if(memtable.isThresholdPassed()){
             // write memtable to dbFilePath and indexFilePath
-            System.out.println("threshold of "+memtable.getThreshold()+" is passed. Making new files");
             DbFilePath dbFilePath = LsmDb.createNewFiles();
-            dumpMemtable(memtable, dbFilePath);
+            dumpMemtable(memtable, dbFilePath, bloomFilter);
             lsmDb.reset();
         }
     }
 
-    public void dumpMemtable(Memtable memtable, DbFilePath dbFilePath) {
+    public void dumpMemtable(Memtable memtable, DbFilePath dbFilePath, BloomFilter<String> bloomFilter) {
         long startSize;
         try {
             startSize = Files.size(Path.of(dbFilePath.getDbFilePath()));
@@ -47,5 +52,13 @@ public class LsmWriteService {
         memtable.forEach((key, value) -> data.add(new KeyValuePair(key, value)));
 
         GeneralUtils.writeToDisk(dbFilePath, startSize, data);
+
+        if(FeatureFlags.BLOOM_FILTERS_ENABLED) {
+            try {
+                bloomFilter.serialise(dbFilePath.getBloomFilterPath());
+            } catch (IOException e) {
+                System.out.println("failed while saving bloom filter disk!");
+            }
+        }
     }
 }

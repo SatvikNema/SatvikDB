@@ -47,7 +47,7 @@ public class Conversion {
     public static Integer toInteger(byte[] arr){
         int bytesInAInt = Integer.BYTES;
         if(arr.length > bytesInAInt){
-            throw new ArithmeticException("Cannot convert bytes to long as byte array has more elements than 1 long can handle");
+            throw new ArithmeticException("Cannot convert bytes to int as byte array has more elements than 1 int can handle");
         }
         int result = 0;
         for(int i=0;i<bytesInAInt;i++){

@@ -30,7 +30,7 @@ public class SimpleReadService implements ReadService {
         }
 
         if(!simpleDbIndex.containsKey(key)){
-            System.out.println(key +" is not present in index. Will lookup db file");
+            // is not present in index. Will lookup db file
             FileEntry fileEntry = GeneralUtils.fetchValueFromFile(raf, key).orElseThrow();
             try {
                 raf.close();

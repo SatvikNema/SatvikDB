@@ -28,7 +28,7 @@ public class MergeService {
     }
 
     public void merge() throws IOException {
-        List<DbFilePath> files = GeneralUtils.loadFilesSortedByAgeDesc(rootDir, indexFileStartsWith, dbFileStartsWith);
+        List<DbFilePath> files = GeneralUtils.loadFilesSortedByAgeDesc(rootDir, indexFileStartsWith, dbFileStartsWith, "null");
         Collections.reverse(files);
         int batch = 10;
 

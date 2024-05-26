@@ -213,7 +213,6 @@ public class GeneralUtils {
         File f = new File(dir);
         if(!f.exists()){
             f.mkdirs();
-            System.out.println("creating new directory "+dir);
         }
     }
 
@@ -224,14 +223,13 @@ public class GeneralUtils {
         for(String path:fileNames){
             try {
                 Files.createFile(Path.of(path));
-                System.out.println("created: "+path);
             } catch (IOException e) {
                 System.out.println("Error while creating "+ path +" "+e.getMessage());
             }
         }
     }
 
-    public static List<DbFilePath> loadFilesSortedByAgeDesc(String rootDir, String indexFilePathStartsWith, String dbFilePathStartsWith) {
+    public static List<DbFilePath> loadFilesSortedByAgeDesc(String rootDir, String indexFilePathStartsWith, String dbFilePathStartsWith, String bloomFilterPathStartsWith) {
         try {
             return Files.list(Path.of(rootDir))
                     .map(Path::getFileName)
@@ -245,7 +243,8 @@ public class GeneralUtils {
                     .map(e -> {
                         long i = Long.parseLong(e.split("_")[1]);
                         String dbFileName = dbFilePathStartsWith+i;
-                        return new DbFilePath(rootDir + File.separatorChar + dbFileName, rootDir + File.separatorChar + e);
+                        String bloomFilterFileName = bloomFilterPathStartsWith +i;
+                        return new DbFilePath(rootDir + File.separatorChar + dbFileName, rootDir + File.separatorChar + e, rootDir+File.separatorChar + bloomFilterFileName);
                     })
                     .collect(Collectors.toList());
         } catch (IOException e) {
@@ -364,7 +363,6 @@ public class GeneralUtils {
     }
 
     private static void deleteFile(Path path) {
-        System.out.println("deleting "+path);
         try {
             Files.delete(path);
         } catch (IOException e) {

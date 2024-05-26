@@ -100,26 +100,24 @@ public class BloomFilter<T> {
     }
 
     public void serialise(String filepath) throws IOException {
-        String bitArrayPath = filepath + "_bit_array.txt";
-        String bloomFilterFilePath = filepath+".txt";
+        String bitArrayPath = filepath + "_bit_array";
 
         bitArray.serialise(bitArrayPath);
 
-        try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(bloomFilterFilePath))){
+        try(BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath))){
             bos.write(Conversion.toBytes(size));
             bos.write(Conversion.toBytes(hashAlgorithmsNumber));
         }
     }
 
     public static <E> BloomFilter<E> load(String filepath) throws IOException {
-        String bitArrayPath = filepath + "_bit_array.txt";
-        String bloomFilterFilePath = filepath+".txt";
+        String bitArrayPath = filepath + "_bit_array";
 
         BitArray loadedBitArray = BitArray.load(bitArrayPath);
 
         int size;
         int numberOfHashes;
-        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(bloomFilterFilePath))){
+        try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filepath))){
             byte[] bytes = bis.readNBytes(Integer.BYTES);
             size = Conversion.toInteger(bytes);
 
