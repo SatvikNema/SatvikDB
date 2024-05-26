@@ -20,7 +20,7 @@ class SatvikDbTest {
 
     @Test
     @Disabled
-    @DisplayName("Do a comprehensive read and write on the database. assert general correctness. No bloom filters involved.")
+    @DisplayName("Do a comprehensive read and write on the database. assert general correctness. No bloom filters involved. Disabled by default. update LsmDbConstants.ROOT_DIR before running")
     void testMain_1() {
         FeatureFlags.BLOOM_FILTERS_ENABLED = false;
         DbService dbService = DbFactory.getDbService(TypesEnum.LSM_SSTABLE);
@@ -47,7 +47,7 @@ class SatvikDbTest {
 
     @Test
     @Disabled
-    @DisplayName("Do a comprehensive read and write on the database. assert general correctness. With bloom filters")
+    @DisplayName("Do a comprehensive read and write on the database. assert general correctness. With bloom filters. Disabled by default. update LsmDbConstants.ROOT_DIR before running")
     void testMain_2() {
         FeatureFlags.BLOOM_FILTERS_ENABLED = true;
         DbService dbService = DbFactory.getDbService(TypesEnum.LSM_SSTABLE);
