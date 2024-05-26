@@ -37,11 +37,6 @@ class SatvikDbTest {
     end = System.currentTimeMillis();
     duration = end - start;
     System.out.println("time taken to read : " + duration + "ms. without bloom filters");
-
-    /*
-    time taken to write: 2155ms. without bloom filters
-    time taken to read : 309ms. without bloom filters
-     */
   }
 
   @Test
@@ -64,11 +59,6 @@ class SatvikDbTest {
     end = System.currentTimeMillis();
     duration = end - start;
     System.out.println("time taken to read : " + duration + "ms. with bloom filters");
-
-    /*
-    time taken to write: 2681ms. with bloom filters
-    time taken to read : 83ms. with bloom filters
-     */
 
   }
 

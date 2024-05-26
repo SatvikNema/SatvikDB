@@ -81,9 +81,26 @@ DbService dbService = DbFactory.getDbService(TypesEnum.SIMPLE);
 3. Notes the `ByteOffset` of the corresponding `value`
 4. Opens the file, directly seeking to the `ByteOffset` and returns the `value`
 
+### How did bloom filters impact the performance?
+
+For `60000` reads and writes, `28` Memtables on disk, 
+`~3000` entries per file and `~20` entries per index
+
+Without bloom filters:
+
+write: `2155 ms`
+read : `309ms`
+
+With bloom filters:
+
+write: `2681ms`
+read : `83ms`
+
+~3x read improvement with a little hit on write performance.
+
 ## Todo
- - [ ] Implement delete feature
- - [ ] Add bloom filter to filter out missing keys. Currently, if the lookup key is not present in the database, we scan all the `SSTable` indexes. This is not very efficient.
- - [ ] Optimise compaction to be `size tiered` / `level tiered` 
+- [ ] Implement delete feature
+- [x] Add bloom filter to filter out missing keys. Currently, if the lookup key is not present in the database, we scan all the `SSTable` indexes. This is not very efficient.
+- [ ] Optimise compaction to be `size tiered` / `level tiered`
 
 [1]: https://dataintensive.net/
