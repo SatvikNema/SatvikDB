@@ -62,6 +62,23 @@ Compaction is idempotent, i.e you can run it x number of times, but the result w
 
 This flow is similar to what [LevelDB](https://github.com/google/leveldb) and [RocksBD](https://github.com/facebook/rocksdb) do.
 
+### How did bloom filters impact the performance?
+
+For `60000` reads and writes, `28` Memtables on disk,
+`~3000` entries per file and `~20` entries per index
+
+Without bloom filters:
+
+write: `2155 ms`
+read : `309ms`
+
+With bloom filters:
+
+write: `2681ms`
+read : `83ms`
+
+~3x read improvement with a little hit on write performance.
+
 ## Other implementations - Simple db
 This project also includes an implementation of a simple append only database which stores the keys in the order in which they were written. Includes no optimisation.
 To see how that works, change the code in main/test file to this
@@ -80,23 +97,6 @@ DbService dbService = DbFactory.getDbService(TypesEnum.SIMPLE);
 2. Does a linear scan until in encounters the `key`
 3. Notes the `ByteOffset` of the corresponding `value`
 4. Opens the file, directly seeking to the `ByteOffset` and returns the `value`
-
-### How did bloom filters impact the performance?
-
-For `60000` reads and writes, `28` Memtables on disk, 
-`~3000` entries per file and `~20` entries per index
-
-Without bloom filters:
-
-write: `2155 ms`
-read : `309ms`
-
-With bloom filters:
-
-write: `2681ms`
-read : `83ms`
-
-~3x read improvement with a little hit on write performance.
 
 ## Todo
 - [ ] Implement delete feature
