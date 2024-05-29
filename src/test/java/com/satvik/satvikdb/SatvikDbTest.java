@@ -59,7 +59,6 @@ class SatvikDbTest {
     end = System.currentTimeMillis();
     duration = end - start;
     System.out.println("time taken to read : " + duration + "ms. with bloom filters");
-
   }
 
   private void readData(DbService dbService) {

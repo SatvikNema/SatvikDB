@@ -36,6 +36,12 @@ public class BloomFilter<T> {
     return new BloomFilter<>(size, hashAlgorithmsNumber, bitArray);
   }
 
+  public static <E> BloomFilter<E> create(int numberOfInsertions, double errorThreshold) {
+    int b = getOptimalBitArraySize(numberOfInsertions, errorThreshold);
+    int k = getOptimalNumberOfHashFunctions(numberOfInsertions, b);
+    return new BloomFilter<>(b, k, new BitArray(b));
+  }
+
   private BloomFilter(int size, int hashAlgorithmsNumber, BitArray bitArray) {
     this.size = size;
     this.hashAlgorithmsNumber = hashAlgorithmsNumber;
@@ -133,5 +139,21 @@ public class BloomFilter<T> {
 
   public BitArray getBitArray() {
     return bitArray.copy();
+  }
+
+  private static int getOptimalBitArraySize(long n, double E) {
+    return (int) (-n * Math.log(E) / (Math.log(2) * Math.log(2)));
+  }
+
+  static int getOptimalNumberOfHashFunctions(long n, long b) {
+    return Math.max(1, (int) Math.round((double) b / n * Math.log(2)));
+  }
+
+  public int getK() {
+    return hashAlgorithmsNumber;
+  }
+
+  public int getB() {
+    return size;
   }
 }

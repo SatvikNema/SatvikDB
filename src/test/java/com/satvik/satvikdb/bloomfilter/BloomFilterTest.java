@@ -1,5 +1,6 @@
 package com.satvik.satvikdb.bloomfilter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.satvik.satvikdb.CommonTestUtil;
@@ -22,7 +23,7 @@ class BloomFilterTest {
   @DisplayName(
       "verify that integer bloom filter works correctly. When elements not present. false positives expected")
   void testCreate_1() {
-    BloomFilter<Integer> bloomFilter = BloomFilter.create(1437758, 10);
+    BloomFilter<Integer> bloomFilter = BloomFilter.create(100_000, 0.001);
 
     int toInsert = 100000;
     for (int i = 0; i < toInsert; i++) {
@@ -42,8 +43,7 @@ class BloomFilterTest {
     System.out.println("Success: " + success);
     System.out.println("Errors: " + errors);
 
-    double perc = (errors / success) * 100;
-    double errorRate = (double) ((int) (perc * ROUND_PLACES)) / ROUND_PLACES;
+    double errorRate = (double) ((int) ((errors / success) * ROUND_PLACES)) / ROUND_PLACES;
     System.out.println("Error rate: " + errorRate);
 
     Map<Integer, Integer> map = bloomFilter.getSeen();
@@ -127,5 +127,15 @@ class BloomFilterTest {
     System.out.println("errorsOg: " + errorsOg);
     System.out.println("successLoaded: " + successLoaded);
     System.out.println("errorsLoaded: " + errorsLoaded);
+  }
+
+  @Test
+  @DisplayName("test calculation for b and k")
+  void test() {
+    BloomFilter<String> bloomFilter = BloomFilter.create(100_000, 0.001);
+    assertEquals(1437758, bloomFilter.getB());
+    assertEquals(10, bloomFilter.getK());
+    // values are taken from https://hur.st/bloomfilter
+
   }
 }
